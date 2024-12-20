@@ -8,12 +8,12 @@ const base64img =
 const uploadBody = {
   image: base64img,
   customer_code: '4413585',
-  measure_datetime: '2024-09-11',
-  measure_type: 'WATER',
+  measurement_datetime: '2024-09-11',
+  measurement_type: 'WATER',
 };
 
 const confirmBody = {
-  measure_uuid: '273fcba0-f422-4b36-9c42-1475be0432a0',
+  measurement_uuid: '273fcba0-f422-4b36-9c42-1475be0432a0',
   confirmed_value: 50,
 };
 
@@ -36,7 +36,7 @@ describe('validateBody', () => {
     describe('when validation occurs on body from CONFIRM route', () => {
       it('should return undefined with no errors', async () => {
         const confirmBody = {
-          measure_uuid: '273fcba0-f422-4b36-9c42-1475be0432a0',
+          measurement_uuid: '273fcba0-f422-4b36-9c42-1475be0432a0',
           confirmed_value: 50,
         };
 
@@ -79,7 +79,7 @@ describe('validateBody', () => {
 
         it('when not inserting a YYYY-MM-DD format string', () => {
           uploadBody.customer_code = '44133585';
-          uploadBody.measure_datetime = '2024/03/12';
+          uploadBody.measurement_datetime = '2024/03/12';
           invalidDataError.error_description = 'Data deve estar no formato YYYY-MM-DD';
 
           expect.assertions(1);
@@ -92,7 +92,7 @@ describe('validateBody', () => {
         });
 
         it('when not inserting a string formatted date', () => {
-          uploadBody.measure_datetime = 2024 - 12 - 11;
+          uploadBody.measurement_datetime = 2024 - 12 - 11;
           invalidDataError.error_description = 'Data deve ser em string';
 
           expect.assertions(1);
@@ -105,8 +105,8 @@ describe('validateBody', () => {
         });
 
         it('when inserting a type different from GAS or WATER', () => {
-          uploadBody.measure_datetime = '2024-09-11';
-          uploadBody.measure_type = 'ENERGY';
+          uploadBody.measurement_datetime = '2024-09-11';
+          uploadBody.measurement_type = 'ENERGY';
           invalidDataError.error_description = 'Insira o tipo da medida como sendo WATER ou GAS';
 
           expect.assertions(1);
@@ -123,7 +123,7 @@ describe('validateBody', () => {
     describe('when validation fails on body from CONFIRM route', () => {
       describe('should return INVALID_DATA error', () => {
         it('when inserting an invalid UUID string', () => {
-          confirmBody.measure_uuid = 'invalidUUID';
+          confirmBody.measurement_uuid = 'invalidUUID';
           invalidDataError.error_description = 'UUID informado é inválido';
 
           expect.assertions(1);
@@ -135,8 +135,8 @@ describe('validateBody', () => {
           }
         });
 
-        it('when not inserting a UUID string in measure_uuid', () => {
-          confirmBody.measure_uuid = 32424;
+        it('when not inserting a UUID string in measurement_uuid', () => {
+          confirmBody.measurement_uuid = 32424;
           invalidDataError.error_description = 'UUID deve ser uma string';
 
           expect.assertions(1);
@@ -149,7 +149,7 @@ describe('validateBody', () => {
         });
 
         it('when confirmed_value is not an integer', () => {
-          confirmBody.measure_uuid = '273fcba0-f422-4b36-9c42-1475be0432a0';
+          confirmBody.measurement_uuid = '273fcba0-f422-4b36-9c42-1475be0432a0';
           confirmBody.confirmed_value = 123.2;
           invalidDataError.error_description = 'Valor da medida deve ser um número inteiro';
 
