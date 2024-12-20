@@ -69,6 +69,9 @@ Access the API documentation and test it with SwaggerUI at https://app.swaggerhu
 
 A service-oriented Model-View-Controller design was preferred aiming segregation of responsibilities, code reusability, maintenance, scalability and easier external API integrations.
 
+> [!IMPORTANT]  
+> When uploading an image, you must provide the base64 with headers included. For image conversions to base64, access the following URL - https://base64.guru/converter/encode/image.
+
 ### Backend
 
 <details>
@@ -110,9 +113,6 @@ One router was created for the measurement controller.
 #### Services
 
 - **uploadService** - validates user input and if a measurement was already registered for the provided month, throwing a DOUBLE_REPORT error if so. Calls saveTemporaryImage helper function to create a temporary link for accessing the uploaded base64 image. Then it calls extractMeasurement function and insert it into the database. Returns the temporary link URL, the measurement value and its UUID.
-
-> [!IMPORTANT]  
-> You must provide the base64 with headers included. For image conversions to base64, access the following URL - https://base64.guru/converter/encode/image.
 
 - **confirmationService** - validates user input and if the measurement was already confirmed for the provided month, throwing a CONFIRMATION_DUPLICATE error if so. It measurement provided is not found in database, throws a MEASUREMENT_NOT_FOUND error. Otherwise, updates the measurement entry in database and returns a success message.
 
