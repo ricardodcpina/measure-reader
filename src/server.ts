@@ -1,19 +1,20 @@
 import 'dotenv/config.js';
 import { connect } from 'mongoose';
+import app from './app';
 
-import app from './app.js';
-const PORT = 3000;
+const PORT = process.env.API_PORT || 3000;
+const DATABASE_URL = process.env.DATABASE_URL as string;
 
 async function main() {
   try {
-    await connect(process.env.DATABASE_URL as string);
+    await connect(DATABASE_URL);
 
     app.listen(PORT, () => {
       console.log(`Server listening on port ${PORT}`);
     });
-  } catch {
+  } catch (error: any) {
     console.log('Error connecting to database');
-    process.exit(0);
+    process.exit(1);
   }
 }
 
