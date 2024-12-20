@@ -30,7 +30,7 @@ Access the API documentation and test it with SwaggerUI at https://app.swaggerhu
 ![Node](https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white) ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![TS-NODE](https://img.shields.io/badge/tsnode-3178C6.svg?style=for-the-badge&logo=ts-node&logoColor=white) ![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB) ![Mongoose](https://img.shields.io/badge/Mongoose-880000.svg?style=for-the-badge&logo=Mongoose&logoColor=white) ![MongoDB](https://img.shields.io/badge/MongoDB-47A248.svg?style=for-the-badge&logo=MongoDB&logoColor=white)
 ![Zod](https://img.shields.io/badge/Zod-3E67B1.svg?style=for-the-badge&logo=Zod&logoColor=white) ![Google Gemini](https://img.shields.io/badge/google%20gemini-8E75B2?style=for-the-badge&logo=google%20gemini&logoColor=white) ![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white)
 
-![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) ![Swagger](https://img.shields.io/badge/Swagger-85EA2D.svg?style=for-the-badge&logo=Swagger&logoColor=black)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) ![Swagger](https://img.shields.io/badge/Swagger-85EA2D.svg?style=for-the-badge&logo=Swagger&logoColor=black) ![Render](https://img.shields.io/badge/Render-000000.svg?style=for-the-badge&logo=Render&logoColor=white) 
 
 <details>
 <summary>Expand for details</summary>
@@ -57,6 +57,8 @@ Access the API documentation and test it with SwaggerUI at https://app.swaggerhu
 **Docker** - Enables developers to package applications and their dependencies into containers, ensuring consistent environments accross different stages of development, testing and production. Makes application managing and distribuition easier.
 
 **Swagger** - Set of tools for designing, documenting and consuming RESTful APIs. It provides an interactive interface for exploring API endpoints and helps automate the process of generating API documentation in a clear and standardized format.
+
+**Render** - PaaS that simplifies deployment of web applications and services. Automates scaling, monitoring and deployment pipelines, ensuring high availability and reliability with minimal configuration. 
 
 </details>
 
