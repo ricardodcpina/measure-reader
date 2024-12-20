@@ -163,10 +163,12 @@ The docker-compose file in root directory runs two main services:
 
 Environment variables:
 
-- GEMINI_API_KEY - Access to Google Gemini API.
+- GEMINI_API_KEY - Key required to access Google Gemini API.
 - DATABASE_URL - Database URL connection string.
-- API_URL - Backend API URL. Defaults to 'http://localhost'
+- API_URL - Backend API URL. Defaults to 'http://localhost'.
 - API_PORT - Backend API port. Defaults to 3000.
+- MONGO_INITDB_ROOT_USERNAME - Mongo root username. Defaults to admin.
+- MONGO_INITDB_ROOT_PASSWORD - Mongo root password. Defaults to admin.
 
 </details>
 
@@ -225,8 +227,6 @@ Create a new fork at https://github.com/ricardodcpina/meter-scanner/fork.
 
     GEMINI_API_KEY=[api-key-here]
     DATABASE_URL=mongodb://admin:admin@localhost:27017/meter-scanner?authSource=admin
-    API_URL=http://localhost
-    API_PORT=3000
 
 5 - Run the application
 
