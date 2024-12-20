@@ -4,16 +4,16 @@ import path from 'path';
 export const saveTemporaryImage = (fileData: {
   base64Img: string;
   customer_code: string;
-  measure_type: string;
+  measurement_type: string;
 }): { fileName: string; filePath: string } => {
-  const { base64Img, customer_code, measure_type } = fileData;
+  const { base64Img, customer_code, measurement_type } = fileData;
 
   // Transform image to binary format and set it's path, name and expiry time
   const fileExt = base64Img.split('/')[1].split(';')[0];
-  const fileName = `${customer_code}-${measure_type.toLowerCase()}-${Date.now()}.${fileExt}`;
+  const fileName = `${customer_code}-${measurement_type.toLowerCase()}-${Date.now()}.${fileExt}`;
   const filePath = path.resolve(__dirname, '..', '..', 'public', fileName);
   const binaryImage = Buffer.from(base64Img.split(',')[1], 'base64');
-  const expirationTime = 30 * 1000;
+  const expirationTime = 60 * 1000;
 
   // Save image binary
   fs.writeFileSync(filePath, binaryImage);
