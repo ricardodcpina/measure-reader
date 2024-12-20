@@ -1,18 +1,20 @@
 services:
   mongo:
-    image: mongo:latest
-    container_name: 'mongodb'
+    image: mongo
     ports:
       - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
 
   backend:
-    image: ricardodcpina/measure-reader-backend
-    container_name: 'backend'
+    build: .
     ports:
-      - 3000:3000
-    env_file:
-      - .env
+      - ${API_PORT:-3000}:${API_PORT:-3000}
     environment:
-      - DATABASE_URL=mongodb://mongo:27017/measure-reader
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - API_URL=${API_URL}
+      - API_PORT=${API_PORT}
+      - DATABASE_URL=mongodb://admin:admin@mongo:27017/meter-scanner?authSource=admin
     depends_on:
       - mongo
