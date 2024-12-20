@@ -1,0 +1,256 @@
+openapi: 3.0.0
+info:
+  title: MeterScanner API
+  description:
+    An application designed to capture and record data from images of
+    utility meters, such as water, gas and eletricity. By scanning images
+    of these meters it automatically extracts measurements and logs them into
+    a database for accurate tracking and analysis.
+  version: 1.0.0
+
+servers:
+  - url: https://7918-170-80-70-165.ngrok-free.app
+    description: Development server
+
+paths:
+  /upload:
+    post:
+      summary: Insert a new measurement
+      description: <DESCRIPTION HERE>
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: Base64
+                  example: data:image/png;base64,iVBORw0KGgoAAAANSUhE...
+                  description: Base64 encoded image of meter
+                customer_code:
+                  type: string
+                  example: 12345
+                measurement_datetime:
+                  type: string
+                  format: date
+                  example: 2024-12-08
+                  description: YYYY-MM-DD
+                measurement_type:
+                  type: string
+                  enum:
+                    - 'WATER'
+                    - 'GAS'
+                  description: Type of measurement
+
+      responses:
+        '200':
+          description: Measurement successfully registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  image_url:
+                    type: string
+                    format: uri
+                    example: 'http://some-domain/files/some-image.png'
+                  measurement_value:
+                    type: number
+                    example: 2738
+                  measurement_uuid:
+                    type: string
+                    format: uuid
+                    example: ddcb51fb-44d5-438f-b000-5c0fe697e1ed
+
+        '400':
+          description: Request data is invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: string
+                    example: INVALID_DATA
+                  error_description:
+                    type: string
+                    example: Dados inválidos
+
+        '409':
+          description: This month's measurement has already been inserted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: string
+                    example: DOUBLE_REPORT
+                  error_description:
+                    type: string
+                    example: Leitura do mês já realizada
+
+  /confirm:
+    patch:
+      summary: Confirm or update a measurement
+      description: <DESCRIPTION HERE>
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                measurement_uuid:
+                  type: string
+                  format: uuid
+                  example: 'bde81a6b-fee7-4842-bfae-d2182dbf9e77'
+                confirmed_value:
+                  type: number
+                  example: 500
+
+      responses:
+        '200':
+          description: Measurement successfully confirmed/updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+        '400':
+          description: Request data is invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: string
+                    example: INVALID_DATA
+                  error_description:
+                    type: string
+                    example: Dados inválidos
+
+        '404':
+          description: Measurement not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: number
+                    example: MEASUREMENT_NOT_FOUND
+                  error_description:
+                    type: string
+                    example: Leitura não encontrada
+
+        '409':
+          description: This month's measurement has already been confirmed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: string
+                    example: CONFIRMATION_DUPLICATE
+                  error_description:
+                    type: string
+                    example: Leitura do mês já confirmada
+
+  /{customerId}/list:
+    get:
+      summary: List measures with filters
+      description: <DESCRIPTION HERE>
+
+      parameters:
+        - in: path
+          name: customerId
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: ngrok-skip-browser-warning
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: measurement_type
+          schema:
+            type: string
+            enum:
+              - WATER
+              - GAS
+              - ELETRICITY
+
+      responses:
+        '200':
+          description: Measurements list obtained successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customer_code:
+                    type: string
+                    example: 12345
+                  measurements:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        measurement_uuid:
+                          type: string
+                          example: bde81a6b-fee7-4842-bfae-d2182dbf9e77
+                        measurement_datetime:
+                          type: string
+                          format: date
+                          example: 2024-12-08T00:00:00.000Z
+                        measurement_type:
+                          type: string
+                          enum:
+                            - 'WATER'
+                            - 'GAS'
+                        has_confirmed:
+                          type: boolean
+                          example: true
+                        image_url:
+                          type: string
+                          example: http://some-domain/files/some-image.png
+
+        '400':
+          description: Measurement type not allowed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: string
+                    example: INVALID_TYPE
+                  error_description:
+                    type: string
+                    example: Tipo de medição não permitida
+
+        '404':
+          description: No measurements found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: string
+                    example: MEASUREMENTS_NOT_FOUND
+                  error_description:
+                    type: string
+                    example: Nenhuma leitura encontrada
