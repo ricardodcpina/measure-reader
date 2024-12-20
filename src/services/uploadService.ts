@@ -9,7 +9,7 @@ import { extractMeasurement } from '../utils/extractMeasurement';
 import { saveTemporaryImage } from '../utils/saveTemporaryImage';
 
 const PORT = process.env.API_PORT || 3000;
-const API_URL = process.env.API_URL || 'http://localhost';
+const API_URL = process.env.API_URL || `http://localhost:${PORT}`;
 
 export default async function uploadService(
   uploadBody: UploadRequest
@@ -52,7 +52,7 @@ export default async function uploadService(
   // Insert formatted measure in db
   const measureUUID = crypto.randomUUID();
   const measureValue = Math.floor(Number(extractedMeasure) * 0.001);
-  const imageURL = `${API_URL}:${PORT}/files/${fileName}`;
+  const imageURL = `${API_URL}/files/${fileName}`;
 
   const measure: Measurement = {
     customer_code,
