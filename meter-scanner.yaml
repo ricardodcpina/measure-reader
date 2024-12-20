@@ -1,22 +1,17 @@
 openapi: 3.0.0
 info:
   title: MeterScanner API
-  description:
-    An application designed to capture and record data from images of
-    utility meters, such as water, gas and eletricity. By scanning images
-    of these meters it automatically extracts measurements and logs them into
-    a database for accurate tracking and analysis.
+  description: MeterScanner is a RESTful API designed to capture and record measurements from images of utility meters, such as water, gas and eletricity. By scanning images of these meters it automatically extracts measurements via Google Gemini LLM API and logs them into a database for accurate tracking and analysis.
   version: 1.0.0
 
 servers:
-  - url: https://7918-170-80-70-165.ngrok-free.app
-    description: Development server
+  - url: https://meter-scanner-e5pk.onrender.com
 
 paths:
   /upload:
     post:
       summary: Insert a new measurement
-      description: <DESCRIPTION HERE>
+      description: Upload a base64-encoded image to extract its measurement via Google Gemini API and insert into database.
 
       requestBody:
         required: true
@@ -29,15 +24,16 @@ paths:
                   type: string
                   format: Base64
                   example: data:image/png;base64,iVBORw0KGgoAAAANSUhE...
-                  description: Base64 encoded image of meter
+                  description: Data URI for a Base64-encoded image of a water or gas meter
                 customer_code:
                   type: string
                   example: 12345
+                  description: Customer identifier
                 measurement_datetime:
                   type: string
                   format: date
                   example: 2024-12-08
-                  description: YYYY-MM-DD
+                  description: Date when the measurement was made
                 measurement_type:
                   type: string
                   enum:
@@ -47,7 +43,7 @@ paths:
 
       responses:
         '200':
-          description: Measurement successfully registered
+          description: Measurement registered successfully
           content:
             application/json:
               schema:
@@ -57,16 +53,19 @@ paths:
                     type: string
                     format: uri
                     example: 'http://some-domain/files/some-image.png'
+                    description: Temporary URL link for acessing uploaded image
                   measurement_value:
                     type: number
                     example: 2738
+                    description: Measurement extracted via Google Gemini API
                   measurement_uuid:
                     type: string
                     format: uuid
                     example: ddcb51fb-44d5-438f-b000-5c0fe697e1ed
+                    description: Measurement identifier
 
         '400':
-          description: Request data is invalid
+          description: Request body contains invalid data, such as fields containing wrong types or were not provided
           content:
             application/json:
               schema:
@@ -80,7 +79,7 @@ paths:
                     example: Dados inválidos
 
         '409':
-          description: This month's measurement has already been inserted
+          description: Measurement has already been inserted for the given month
           content:
             application/json:
               schema:
@@ -95,8 +94,8 @@ paths:
 
   /confirm:
     patch:
-      summary: Confirm or update a measurement
-      description: <DESCRIPTION HERE>
+      summary: Update an inserted measurement
+      description: Confirm or rectify an inserted measurement and update database.
 
       requestBody:
         required: true
@@ -109,13 +108,15 @@ paths:
                   type: string
                   format: uuid
                   example: 'bde81a6b-fee7-4842-bfae-d2182dbf9e77'
+                  description: Measurement identifier
                 confirmed_value:
                   type: number
                   example: 500
+                  description: Confirmed value for measurement
 
       responses:
         '200':
-          description: Measurement successfully confirmed/updated
+          description: Measurement updated successfully
           content:
             application/json:
               schema:
@@ -126,7 +127,7 @@ paths:
                     example: true
 
         '400':
-          description: Request data is invalid
+          description: Request body contains invalid data, such as fields containing wrong types or were not provided
           content:
             application/json:
               schema:
@@ -140,7 +141,7 @@ paths:
                     example: Dados inválidos
 
         '404':
-          description: Measurement not found
+          description: No measurement found with provided measurement_uuid
           content:
             application/json:
               schema:
@@ -154,7 +155,7 @@ paths:
                     example: Leitura não encontrada
 
         '409':
-          description: This month's measurement has already been confirmed
+          description: Measurement has already been confirmed for the given month
           content:
             application/json:
               schema:
@@ -169,20 +170,17 @@ paths:
 
   /{customerId}/list:
     get:
-      summary: List measures with filters
-      description: <DESCRIPTION HERE>
+      summary: List measurements from a customer
+      description: List all measurement with an optional measurement type filter for a given customer. Water and gas are valid measurement types for the moment, but not eletricity. If no measurement type is provided, the list return all measurements disregarding the type.
 
       parameters:
         - in: path
           name: customerId
           required: true
+          example: 4658855
           schema:
             type: string
-        - in: header
-          name: ngrok-skip-browser-warning
-          required: true
-          schema:
-            type: string
+          description: Customer identifier
         - in: query
           name: measurement_type
           schema:
@@ -191,6 +189,7 @@ paths:
               - WATER
               - GAS
               - ELETRICITY
+          description: Type of measurement
 
       responses:
         '200':
@@ -202,7 +201,8 @@ paths:
                 properties:
                   customer_code:
                     type: string
-                    example: 12345
+                    example: 4658855
+                    description: Customer identifier
                   measurements:
                     type: array
                     items:
@@ -211,24 +211,29 @@ paths:
                         measurement_uuid:
                           type: string
                           example: bde81a6b-fee7-4842-bfae-d2182dbf9e77
+                          description: Measurement identifier
                         measurement_datetime:
                           type: string
                           format: date
                           example: 2024-12-08T00:00:00.000Z
+                          description: Date the measurement was made
                         measurement_type:
                           type: string
                           enum:
                             - 'WATER'
                             - 'GAS'
+                          description: Type of measurement
                         has_confirmed:
                           type: boolean
                           example: true
+                          description: Indicates if measurement has been confirmed
                         image_url:
                           type: string
                           example: http://some-domain/files/some-image.png
+                          description: Temporary URL link for acessing uploaded image
 
         '400':
-          description: Measurement type not allowed
+          description: Measurement type filter provided is invalid (eletricity, for instance)
           content:
             application/json:
               schema:
@@ -242,7 +247,7 @@ paths:
                     example: Tipo de medição não permitida
 
         '404':
-          description: No measurements found
+          description: No measurements were found for the given customer
           content:
             application/json:
               schema:
@@ -254,3 +259,52 @@ paths:
                   error_description:
                     type: string
                     example: Nenhuma leitura encontrada
+                    
+components:
+  schemas:
+    Measurement:
+      type: object
+      required:
+        - customer_code
+        - measurement_uuid
+        - measurement_value
+        - measurement_datetime
+        - measurement_type
+      properties:
+        customer_code:
+          type: string
+          example: 4658855
+          description: Customer identifier
+        measurement_uuid:
+          type: string
+          format: uuid
+          example: ddcb51fb-44d5-438f-b000-5c0fe697e1ed
+          description: Measurement identifier
+        measurement_value:
+          type: number
+          example: 2738
+          description: Measurement value extracted from Google Gemini API
+        measurement_datetime:
+          type: string
+          format: date
+          example: 2024-12-08
+          description: Date when the measurement was made
+        measurement_month:
+          type: integer
+          example: 11
+          description: Month of measurement, where 0 is January
+        measurement_type:
+          type: string
+          enum:
+            - 'WATER'
+            - 'GAS'
+          description: Type of measurement
+        has_confirmed:
+          type: boolean
+          example: false
+          description: Indicates if measurement has been confirmed
+        image_url:
+          type: string
+          format: url
+          example: 'http://some-domain/files/some-image.png'
+          description: Temporary URL link for acessing uploaded image
