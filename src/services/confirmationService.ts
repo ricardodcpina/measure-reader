@@ -1,6 +1,9 @@
-import { MeasureModel } from '../models';
+import { MeasurementModel } from '../models';
 
-import { confirmationDuplicate, measureNotFound } from '../errors';
+import {
+  confirmationDuplicate,
+  measurementNotFound,
+} from '../errors';
 import { ConfirmRequest, ConfirmResponse } from '../types';
 
 import { validateBody } from '../utils/validateBody';
@@ -8,22 +11,22 @@ import { validateBody } from '../utils/validateBody';
 export default async function confirmationService(
   confirmBody: ConfirmRequest
 ): Promise<ConfirmResponse> {
-  const { measure_uuid, confirmed_value } = confirmBody;
+  const { measurement_uuid, confirmed_value } = confirmBody;
 
   // Validate user input
   validateBody('confirm', confirmBody);
 
   // Checks if measure exists and is confirmed
-  const measure = await MeasureModel.findOne({
-    measure_uuid,
+  const measurement = await MeasurementModel.findOne({
+    measurement_uuid,
   });
-  if (!measure) throw measureNotFound;
-  if (measure.has_confirmed) throw confirmationDuplicate;
+  if (!measurement) throw measurementNotFound;
+  if (measurement.has_confirmed) throw confirmationDuplicate;
 
   // Confirms measure and saves in db
-  await MeasureModel.updateOne(
-    { measure_uuid: measure_uuid },
-    { measure_value: confirmed_value, has_confirmed: true }
+  await MeasurementModel.updateOne(
+    { measurement_uuid: measurement_uuid },
+    { measurement_value: confirmed_value, has_confirmed: true }
   );
 
   return { success: true };

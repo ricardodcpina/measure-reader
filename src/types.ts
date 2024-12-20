@@ -1,21 +1,21 @@
-export type Measure = {
+export type Measurement = {
   customer_code: string;
-  measure_uuid: string;
-  measure_value: number;
-  measure_month: Number;
-  measure_datetime: Date;
-  measure_type: 'WATER' | 'GAS';
+  measurement_uuid: string;
+  measurement_value: number;
+  measurement_month: Number;
+  measurement_datetime: Date;
+  measurement_type: 'WATER' | 'GAS';
   has_confirmed: boolean;
   image_url: string;
 };
 
-export type MeasureError = {
+export type MeasurementError = {
   status_code: number;
   error_code:
     | 'INVALID_TYPE'
     | 'INVALID_DATA'
-    | 'MEASURE_NOT_FOUND'
-    | 'MEASURES_NOT_FOUND'
+    | 'MEASUREMENT_NOT_FOUND'
+    | 'MEASUREMENTS_NOT_FOUND'
     | 'CONFIRMATION_DUPLICATE'
     | 'DOUBLE_REPORT';
   error_description: string;
@@ -24,16 +24,19 @@ export type MeasureError = {
 export type UploadRequest = {
   image: string;
   customer_code: string;
-  measure_datetime: string;
-  measure_type: 'WATER' | 'GAS';
+  measurement_datetime: string;
+  measurement_type: 'WATER' | 'GAS';
 };
 
 export type ConfirmRequest = {
-  measure_uuid: string;
+  measurement_uuid: string;
   confirmed_value: number;
 };
 
-export type UploadResponse = Pick<Measure, 'image_url' | 'measure_value' | 'measure_uuid'>;
+export type UploadResponse = Pick<
+  Measurement,
+  'image_url' | 'measurement_value' | 'measurement_uuid'
+>;
 
 export type ConfirmResponse = {
   success: boolean;
@@ -41,5 +44,5 @@ export type ConfirmResponse = {
 
 export type ListResponse = {
   customer_code: string;
-  measures: Omit<Measure, 'customer_code'>[];
+  measurements: Omit<Measurement, 'customer_code'>[];
 };

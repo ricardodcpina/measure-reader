@@ -25,20 +25,21 @@ export const validateBody = (
           required_error: 'Insira o código de cliente',
           invalid_type_error: 'Código de cliente deve ser uma string',
         }),
-        measure_datetime: z
+        measurement_datetime: z
           .string({
             required_error: 'Insira a data da leitura',
             invalid_type_error: 'Data deve ser em string',
           })
           .date('Data deve estar no formato YYYY-MM-DD'),
-        measure_type: z.enum(['WATER', 'GAS'], {
+        measurement_type: z.enum(['WATER', 'GAS'], {
           message: 'Insira o tipo da medida como sendo WATER ou GAS',
         }),
       });
       break;
+
     case 'confirm':
       bodySchema = z.object({
-        measure_uuid: z
+        measurement_uuid: z
           .string({
             required_error: 'Insira o UUID de uma medida',
             invalid_type_error: 'UUID deve ser uma string',
@@ -47,9 +48,12 @@ export const validateBody = (
         confirmed_value: z
           .number({
             required_error: 'Insira o valor de uma medida',
-            invalid_type_error: 'Valor da medida deve ser um número inteiro',
+            invalid_type_error:
+              'Valor da medida deve ser um número inteiro',
           })
-          .int({ message: 'Valor da medida deve ser um número inteiro' }),
+          .int({
+            message: 'Valor da medida deve ser um número inteiro',
+          }),
       });
       break;
     default:
@@ -60,7 +64,9 @@ export const validateBody = (
     const validation = bodySchema.safeParse(bodyData);
 
     if (!validation.success) {
-      const errorMessages = validation.error.errors.map((error) => error.message);
+      const errorMessages = validation.error.errors.map(
+        (error) => error.message
+      );
       invalidData.error_description = errorMessages.join(' | ');
       throw invalidData;
     }

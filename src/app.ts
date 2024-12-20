@@ -1,7 +1,7 @@
 import path from 'path';
 import express from 'express';
-import router from './controllers.js';
-import { errorHandler } from './middlewares.js';
+import router from './controllers';
+import { errorHandler } from './middlewares';
 
 const app = express();
 const publicDir = path.resolve(__dirname, '..', 'public');
