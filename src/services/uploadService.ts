@@ -1,28 +1,37 @@
 import crypto from 'crypto';
 
-import { MeasureModel } from '../models';
-import { Measure, UploadRequest, UploadResponse } from '../types';
+import { MeasurementModel } from '../models';
+import { Measurement, UploadRequest, UploadResponse } from '../types';
 import { doubleReport } from '../errors';
 
 import { validateBody } from '../utils/validateBody';
-import { extractMeasure } from '../utils/extractMeasure';
+import { extractMeasurement } from '../utils/extractMeasurement';
 import { saveTemporaryImage } from '../utils/saveTemporaryImage';
 
-export default async function uploadService(uploadBody: UploadRequest): Promise<UploadResponse> {
-  const baseURL = `http://localhost:3000`;
-  const { image, customer_code, measure_type, measure_datetime } = uploadBody;
+const PORT = process.env.API_PORT || 3000;
+const API_URL = process.env.API_URL || 'http://localhost';
+
+export default async function uploadService(
+  uploadBody: UploadRequest
+): Promise<UploadResponse> {
+  const {
+    image,
+    customer_code,
+    measurement_type,
+    measurement_datetime,
+  } = uploadBody;
 
   // Validate user input
   validateBody('upload', uploadBody);
 
   // Checks for duplicates in db
-  const measureDate = new Date(measure_datetime);
-  const measureMonth = measureDate.getMonth();
+  const measurementDate = new Date(measurement_datetime);
+  const measurementMonth = measurementDate.getMonth();
 
-  const duplicateMeasure = await MeasureModel.findOne({
+  const duplicateMeasure = await MeasurementModel.findOne({
     customer_code,
-    measure_month: measureMonth,
-    measure_type: measure_type,
+    measurement_month: measurementMonth,
+    measurement_type: measurement_type,
   });
   if (duplicateMeasure) throw doubleReport;
 
@@ -30,33 +39,36 @@ export default async function uploadService(uploadBody: UploadRequest): Promise<
   const fileData = {
     base64Img: image,
     customer_code: customer_code,
-    measure_type: measure_type,
+    measurement_type: measurement_type,
   };
   const { fileName, filePath } = saveTemporaryImage(fileData);
 
   // Google Gemini AI extracts the measure
-  const extractedMeasure = await extractMeasure(fileName, filePath);
+  const extractedMeasure = await extractMeasurement(
+    fileName,
+    filePath
+  );
 
   // Insert formatted measure in db
   const measureUUID = crypto.randomUUID();
   const measureValue = Math.floor(Number(extractedMeasure) * 0.001);
-  const imageURL = `${baseURL}/files/${fileName}`;
+  const imageURL = `${API_URL}:${PORT}/files/${fileName}`;
 
-  const measure: Measure = {
+  const measure: Measurement = {
     customer_code,
-    measure_uuid: measureUUID,
-    measure_value: measureValue,
-    measure_datetime: measureDate,
-    measure_month: measureMonth,
-    measure_type,
+    measurement_uuid: measureUUID,
+    measurement_value: measureValue,
+    measurement_datetime: measurementDate,
+    measurement_month: measurementMonth,
+    measurement_type,
     has_confirmed: false,
     image_url: imageURL,
   };
-  await MeasureModel.create(measure);
+  await MeasurementModel.create(measure);
 
   return {
     image_url: imageURL,
-    measure_value: measureValue,
-    measure_uuid: measureUUID,
+    measurement_value: measureValue,
+    measurement_uuid: measureUUID,
   };
 }
