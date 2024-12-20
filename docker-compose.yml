@@ -13,7 +13,6 @@ services:
       - ${API_PORT:-3000}:${API_PORT:-3000}
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - API_URL=${API_URL}
       - API_PORT=${API_PORT}
       - DATABASE_URL=mongodb://admin:admin@mongo:27017/meter-scanner?authSource=admin
     depends_on:
